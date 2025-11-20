@@ -1,4 +1,3 @@
-import json
 import random
 import time
 import os
@@ -25,20 +24,16 @@ def delivery_report(err, msg):
     if err is not None:
         print(f'Message delivery failed: {err}')
     else:
-        print(f'Message delivered to {msg.topic()} [{msg.partition()}]')
+        print(f'Delivered to {msg.topic()}: {msg.value().decode("utf-8")}')
 
-def produce_random_number():
+def produce_numbers():
+    """Produce random numbers (just the number, no JSON)"""
     while True:
-        random_number = random.randint(0, 1000)
-        message = {
-            'value': random_number,
-            'timestamp': time.time()
-        }
+        random_number = random.randint(1, 100)
         
         producer.produce(
             'topic1',
-            key=str(random_number).encode('utf-8'),
-            value=json.dumps(message).encode('utf-8'),
+            value=str(random_number).encode('utf-8'),
             callback=delivery_report
         )
         
@@ -48,8 +43,8 @@ def produce_random_number():
 
 if __name__ == '__main__':
     try:
-        produce_random_number()
+        produce_numbers()
     except KeyboardInterrupt:
-        print('Producer stopped')
+        print('\nProducer stopped')
     finally:
         producer.flush()
